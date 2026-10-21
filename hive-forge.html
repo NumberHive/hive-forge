@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forge the Third</title>
+<style>
+:root{
+  --honey:#F5A623; --honey-d:#B87400; --honey-l:#FFE3A3;
+  --navy:#1B2A49; --cream:#FFF8E7; --paper:#FFFFFF;
+  --you:#1F9E8F; --you-l:#E4F6F3; --muted:#5F6B86; --good:#1E8E4E; --bad:#C62F2F;
+  --cw: min(104px, calc((100vw - 96px) / 3));
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--cream);color:var(--navy);font-family:ui-rounded,"Avenir Next Rounded","Nunito","Segoe UI",system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:640px;margin:0 auto;padding:14px 16px 48px}
+header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.brand{display:flex;align-items:center;gap:10px}
+.hex{width:30px;height:34px;background:var(--honey);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);display:inline-block}
+h1{font-size:24px;margin:0}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:inline-flex;border:2px solid var(--navy);border-radius:10px;overflow:hidden;background:#fff}
+.seg button{border:0;background:#fff;color:var(--navy);padding:6px 10px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+.btn{border:2px solid var(--navy);background:var(--honey);color:var(--navy);border-radius:12px;padding:10px 16px;font:inherit;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 3px 0 var(--navy)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--navy)}
+.btn.ghost{background:#fff}
+.btn.small{padding:6px 12px;font-size:13px}
+.btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+.btn:focus-visible,.seg button:focus-visible,.st button:focus-visible,.chip:focus-visible{outline:3px solid var(--navy);outline-offset:2px}
+details.how{background:#fff;border:2px solid var(--navy);border-radius:12px;padding:8px 12px;margin-bottom:10px;font-size:14px}
+details.how summary{cursor:pointer;font-weight:800}
+details.how ol{margin:8px 0 2px;padding-left:20px;line-height:1.45}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.prog{display:flex;gap:5px;flex-wrap:wrap}
+.ph{width:24px;height:27px;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:#E3DCC6}
+.ph.cur{background:var(--navy)}
+.ph.first{background:var(--honey)}
+.ph.later{background:#F6CD7B}
+.ph.reveal{background:#9AA3B8}
+.score{font-weight:900;font-size:15px;background:#fff;border:2px solid var(--navy);border-radius:12px;padding:4px 12px}
+.score b{font-size:24px}
+#banner{min-height:50px;border-radius:12px;padding:10px 12px;font-weight:700;font-size:14.5px;line-height:1.4;background:var(--honey-l);border:2px solid var(--honey-d);margin-bottom:14px}
+#banner.good{background:#DDF4E6;border-color:var(--good)}
+#banner.bad{background:#FBE0E0;border-color:var(--bad)}
+.triplet{display:flex;justify-content:center;align-items:flex-start;gap:6px;margin-bottom:14px}
+.eq{font-size:30px;font-weight:900;align-self:center;margin-top:calc(var(--cw) * .5 - 18px)}
+.slot{display:flex;flex-direction:column;align-items:center;gap:6px;width:var(--cw)}
+.cap{font-size:11.5px;font-weight:800;text-align:center;color:var(--muted);line-height:1.2;text-transform:uppercase;letter-spacing:.4px}
+.slot.tgt .cap{color:var(--honey-d)}
+.card{position:relative;width:var(--cw);aspect-ratio:3/4;background:var(--paper);border-radius:calc(var(--cw) * .12);border:3px solid var(--navy);display:flex;align-items:center;justify-content:center;font-size:calc(var(--cw) * .3);color:var(--navy);box-shadow:0 3px 0 rgba(27,42,73,.3);padding:3px}
+.card.ph0{background:repeating-linear-gradient(45deg,#FFF3D1,#FFF3D1 8px,#FFE9B0 8px,#FFE9B0 16px);border-style:dashed;font-size:calc(var(--cw) * .5);font-weight:900;color:var(--honey-d)}
+.card.forged{background:var(--you-l);border-color:var(--you);animation:pop .45s ease-out}
+@keyframes pop{0%{transform:scale(.7) rotate(-6deg)}60%{transform:scale(1.08) rotate(2deg)}100%{transform:scale(1)}}
+.card svg{width:100%;height:100%;display:block}
+.fr{display:inline-flex;flex-direction:column;align-items:center;line-height:1.05;font-weight:800}
+.fr .nu{padding:0 .18em .06em;border-bottom:.08em solid currentColor}
+.fr .de{padding-top:.06em}
+.mx{display:inline-flex;align-items:center;gap:.14em}
+.mx .wh{font-size:1.3em;font-weight:800}
+.stage{background:#fff;border:3px solid var(--navy);border-radius:18px;padding:16px;box-shadow:0 5px 0 rgba(27,42,73,.25)}
+.stage h2{margin:0 0 4px;font-size:19px}
+.stage p{margin:4px 0 12px;font-size:14px;color:var(--muted);line-height:1.45}
+.stage.shake{animation:shake .35s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.nb{display:flex;justify-content:center;align-items:center;gap:18px;margin:6px 0 16px}
+.fracb{display:inline-flex;flex-direction:column;align-items:center}
+.vinc{height:6px;background:var(--navy);width:100%;border-radius:3px;margin:8px 0}
+.st{display:inline-flex;align-items:center;gap:8px}
+.st button{width:44px;height:44px;border-radius:12px;border:2px solid var(--navy);background:var(--honey);font:inherit;font-size:26px;font-weight:900;color:var(--navy);cursor:pointer;line-height:1;padding:0}
+.st button:disabled{opacity:.3;cursor:default}
+.sv{min-width:58px;text-align:center;font-size:42px;font-weight:900}
+.fixd{display:flex;flex-direction:column;align-items:center;font-size:42px;font-weight:900;padding:0 4px}
+.fixd small{font-size:11px;font-weight:800;color:var(--honey-d);text-transform:uppercase;letter-spacing:.5px}
+.wl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);text-align:center;margin-bottom:4px}
+.dctl{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;align-items:flex-end;margin-bottom:8px}
+.dctl .sv{font-size:30px;min-width:44px}
+.dctl .st button{width:38px;height:38px;font-size:22px}
+.readout{text-align:center;font-weight:800;font-size:14px;margin:4px 0 8px}
+.dsvg{display:block;margin:0 auto;max-width:360px;width:100%}
+.dsvg [data-act="slice"]{cursor:pointer;transition:fill .1s}
+.dsvg [data-act="slice"]:hover{filter:brightness(.95)}
+.row-btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:12px}
+.bigfrac{display:flex;justify-content:center;align-items:center;font-size:56px;margin:8px 0 14px;color:var(--navy)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:12px}
+.chip{border:2px solid var(--navy);background:var(--honey-l);border-radius:12px;padding:8px 12px;font:inherit;font-weight:900;font-size:17px;color:var(--navy);cursor:pointer;min-width:52px}
+.chip:hover{background:var(--honey)}
+.trail{text-align:center;font-weight:800;font-size:14px;color:var(--muted);min-height:20px;margin-bottom:6px}
+.modal{position:fixed;inset:0;background:rgba(27,42,73,.6);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
+.modal[hidden]{display:none}
+.panel{background:#fff;border:3px solid var(--navy);border-radius:18px;padding:20px;max-width:440px;width:100%;box-shadow:0 8px 0 rgba(27,42,73,.35)}
+.panel h3{margin:0 0 6px;font-size:24px}
+.panel p{margin:6px 0;line-height:1.45;font-size:15px}
+.finalrow{display:flex;justify-content:space-around;margin:12px 0;font-weight:800;text-align:center}
+.finalrow .big{font-size:34px;display:block}
+@media (max-width:420px){ h1{font-size:20px} .st button{width:40px;height:40px} .sv{min-width:44px;font-size:36px} .nb{gap:10px} }
+@media (prefers-reduced-motion:reduce){ .card.forged,.stage.shake{animation:none} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><span class="hex"></span><h1>Forge the Third</h1></div>
+    <div class="controls">
+      <div class="seg" id="segLevel" role="group" aria-label="Level">
+        <button data-v="1" aria-pressed="true">Level 1</button>
+        <button data-v="2" aria-pressed="false">Level 2</button>
+      </div>
+      <button class="btn ghost small" id="btnNew">New run</button>
+    </div>
+  </header>
+
+  <details class="how">
+    <summary>How to play</summary>
+    <ol>
+      <li>Every triplet is three cards worth the same amount. Two are given. You forge the third.</li>
+      <li>Use the dials to build a number, or cut and shade a diagram. Press Forge it to check.</li>
+      <li>First try is 3 points, second try 2, third try 1. After three misses you can reveal it for 0.</li>
+      <li>Simplify bonus: shrink your new card to its simplest form by dividing the top and bottom by the same number. Worth 2, plus 1 for a clean finish.</li>
+      <li>Level 2 locks the bottom number (or the number of parts) so you must build the unsimplified version, like 6/12, then simplify it back.</li>
+    </ol>
+  </details>
+
+  <div class="top">
+    <div class="prog" id="prog" aria-label="Progress"></div>
+    <div class="score">Score <b id="score">0</b></div>
+  </div>
+
+  <div id="banner" role="status" aria-live="polite"></div>
+  <div class="triplet" id="triplet"></div>
+  <div class="stage" id="stage"></div>
+</div>
+
+<div class="modal" id="modal" hidden><div class="panel" id="panel"></div></div>
+
+<script>
+(() => {
+'use strict';
+const T = 8, FORGE_PTS = [3,2,1], SIMP = 2, CLEAN = 1;
+const gcd = (a,b)=> b ? gcd(b, a % b) : a;
+const rnd = n => Math.floor(Math.random()*n);
+const pick = a => a[rnd(a.length)];
+const shuffle = a => { for (let i=a.length-1;i>0;i--){ const j=rnd(i+1); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const $ = id => document.getElementById(id);
+const KIND = {mixed:'Mixed number', imp:'Improper fraction', num:'Fraction', circle:'Circle diagram', bar:'Bar diagram'};
+
+/* ---------- triplet generation (shared design with Triplet Hive) ---------- */
+function valuePool(level){
+  const dens = level === 1 ? [2,3,4,5,6,8] : [2,3,4,5,6];
+  const maxV = level === 1 ? 3 : 3.5;
+  const out = [];
+  for (const q of dens) for (let p=1; p/q < maxV; p++) if (gcd(p,q) === 1) out.push({P:p,Q:q});
+  return out;
+}
+function mk(tid, v, kind, k){
+  const c = {tid, kind, k, P:v.P, Q:v.Q};
+  if (kind === 'mixed'){ const w = Math.floor(v.P/v.Q); c.w = w; c.n = (v.P - w*v.Q)*k; c.d = v.Q*k; }
+  else { c.n = v.P*k; c.d = v.Q*k; }
+  return c;
+}
+function makeTriplet(tid, v, level){
+  const improper = v.P > v.Q;
+  const maxK = Math.max(1, Math.floor(12 / v.Q));
+  const shape = () => pick(['circle','bar']);
+  for (let t=0; t<600; t++){
+    let kinds;
+    if (improper) kinds = ['mixed','imp',shape()];
+    else if (level === 1 || Math.random() < .5) kinds = ['num','circle','bar'];
+    else kinds = ['num','num',shape()];
+    let ks;
+    if (level === 1) ks = kinds.map(kd => (kd==='circle'||kd==='bar') ? pick([1,2].filter(x=>x<=maxK)) : 1);
+    else ks = kinds.map(() => 1 + rnd(maxK));
+    if (level === 2){
+      if (ks.every(k => k === ks[0])) continue;
+      if (ks.filter(k => k > 1).length < 2) continue;
+    }
+    if (new Set(kinds.map((kd,i)=>kd+ks[i])).size < 3) continue;
+    return kinds.map((kd,i) => mk(tid, v, kd, ks[i]));
+  }
+  return [mk(tid,v,improper?'mixed':'num',1), mk(tid,v,improper?'imp':'circle',1), mk(tid,v,improper?'circle':'bar',1)];
+}
+function buildRounds(level){
+  const pool = valuePool(level), chosen = [];
+  const used = c => chosen.some(x => x.P === c.P && x.Q === c.Q);
+  while (chosen.length < T){
+    let cand = null;
+    if (chosen.length && Math.random() < .5){
+      const b = pick(chosen);
+      const cous = pool.filter(c => !used(c) && (c.Q === b.Q || c.P === b.P || (c.P === b.Q && c.Q === b.P)));
+      if (cous.length) cand = pick(cous);
+    }
+    if (!cand){
+      const proper = Math.random() < .45;
+      cand = pick(pool.filter(c => !used(c) && (proper ? c.P < c.Q : c.P > c.Q)));
+    }
+    chosen.push(cand);
+  }
+  const rounds = chosen.map((v,i) => {
+    const cs = makeTriplet(i, v, level);
+    const cands = level === 2 ? cs.filter(c => c.k > 1) : cs;
+    const target = pick(cands);
+    return {P:v.P, Q:v.Q, target, givens: shuffle(cs.filter(c => c !== target))};
+  });
+  return shuffle(rounds);
+}
+
+/* ---------- rendering helpers ---------- */
+function fracHTML(w, n, d){
+  const f = `<span class="fr"><span class="nu">${n}</span><span class="de">${d}</span></span>`;
+  return w ? `<span class="mx"><span class="wh">${w}</span>${f}</span>` : f;
+}
+function sliceD(cx, cy, r, q, i){
+  const a0 = -Math.PI/2 + i*2*Math.PI/q, a1 = a0 + 2*Math.PI/q;
+  const x0 = cx + r*Math.cos(a0), y0 = cy + r*Math.sin(a0), x1 = cx + r*Math.cos(a1), y1 = cy + r*Math.sin(a1);
+  return `M${cx},${cy} L${x0.toFixed(2)},${y0.toFixed(2)} A${r},${r} 0 ${(a1-a0) > Math.PI ? 1 : 0} 1 ${x1.toFixed(2)},${y1.toFixed(2)} Z`;
+}
+/* static, fill-first diagram for cards */
+function staticDiagram(c){
+  const q = c.d, n = Math.ceil(c.n / c.d);
+  let rem = c.n, s = '';
+  if (c.kind === 'circle'){
+    const r = n === 1 ? 42 : n === 2 ? 27 : 22;
+    for (let i=0;i<n;i++){
+      let cx, cy;
+      if (n === 1){ cx = 60; cy = 50; } else if (n === 2){ cx = 32 + i*56; cy = 50; } else { cx = 32 + (i%2)*56; cy = 26 + Math.floor(i/2)*48; }
+      const k = Math.min(q, rem); rem -= k;
+      for (let j=0;j<q;j++) s += `<path d="${sliceD(cx,cy,r,q,j)}" fill="${j<k?'#F5A623':'#FFF3D1'}" stroke="#1B2A49" stroke-width="${q>=10?.8:1.3}" stroke-linejoin="round"/>`;
+      s += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1B2A49" stroke-width="2"/>`;
+    }
+  } else {
+    const gap = 7, h = Math.min(30, (96 - (n-1)*gap) / n), total = n*h + (n-1)*gap, y0 = (100 - total)/2, cw = 112 / q;
+    for (let i=0;i<n;i++){
+      const k = Math.min(q, rem); rem -= k;
+      const y = y0 + i*(h+gap);
+      for (let j=0;j<q;j++) s += `<rect x="${(4 + j*cw).toFixed(2)}" y="${y.toFixed(2)}" width="${cw.toFixed(2)}" height="${h.toFixed(2)}" fill="${j<k?'#F5A623':'#FFF3D1'}" stroke="#1B2A49" stroke-width="${q>=10?.8:1.3}"/>`;
+      s += `<rect x="4" y="${y.toFixed(2)}" width="112" height="${h.toFixed(2)}" fill="none" stroke="#1B2A49" stroke-width="2"/>`;
+    }
+  }
+  return `<svg viewBox="0 0 120 100" aria-hidden="true">${s}</svg>`;
+}
+function faceHTML(c){
+  if (c.kind === 'circle' || c.kind === 'bar') return staticDiagram(c);
+  if (c.kind === 'mixed') return fracHTML(c.w, c.n, c.d);
+  return fracHTML(0, c.n, c.d);
+}
+function shortLabel(c){
+  if (c.kind === 'mixed') return `${c.w} ${c.n}/${c.d}`;
+  if (c.kind === 'circle') return `circle ${c.n}/${c.d}`;
+  if (c.kind === 'bar') return `bar ${c.n}/${c.d}`;
+  return `${c.n}/${c.d}`;
+}
+function simplestText(P, Q){
+  return P > Q ? `${Math.floor(P/Q)} ${P % Q}/${Q}` : `${P}/${Q}`;
+}
+
+/* interactive builder diagram */
+function builderSVG(kind, shapes, parts, shaded){
+  let s = '', vb;
+  const on = (si, i) => shaded.has(si + ':' + i);
+  if (kind === 'circle'){
+    const pos = (shapes === 1 ? [[160,85]] : shapes === 2 ? [[90,85],[230,85]] : [[90,80],[230,80],[90,220],[230,220]]).slice(0, shapes);
+    const r = shapes === 1 ? 78 : shapes === 2 ? 66 : 62;
+    vb = shapes <= 2 ? '0 0 320 170' : '0 0 320 300';
+    pos.forEach(([cx,cy], si) => {
+      for (let i=0;i<parts;i++) s += `<path data-act="slice" data-s="${si}" data-i="${i}" d="${sliceD(cx,cy,r,parts,i)}" fill="${on(si,i)?'#F5A623':'#FFF3D1'}" stroke="#1B2A49" stroke-width="${parts>=10?1.2:2}" stroke-linejoin="round" role="button" aria-label="shape ${si+1} part ${i+1}"/>`;
+      s += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1B2A49" stroke-width="3" pointer-events="none"/>`;
+    });
+  } else {
+    const h = 44, gap = 14, H = shapes*h + (shapes-1)*gap + 20, cw = 296 / parts;
+    vb = `0 0 320 ${H}`;
+    for (let si=0; si<shapes; si++){
+      const y = 10 + si*(h+gap);
+      for (let i=0;i<parts;i++) s += `<rect data-act="slice" data-s="${si}" data-i="${i}" x="${(12 + i*cw).toFixed(2)}" y="${y}" width="${cw.toFixed(2)}" height="${h}" fill="${on(si,i)?'#F5A623':'#FFF3D1'}" stroke="#1B2A49" stroke-width="${parts>=10?1.2:2}" role="button" aria-label="bar ${si+1} part ${i+1}"/>`;
+      s += `<rect x="12" y="${y}" width="296" height="${h}" fill="none" stroke="#1B2A49" stroke-width="3" pointer-events="none"/>`;
+    }
+  }
+  return `<svg class="dsvg" viewBox="${vb}">${s}</svg>`;
+}
+
+/* ---------- state ---------- */
+let S = null, setLevel = 1;
+const R = () => S.rounds[S.i];
+const isDiag = k => k === 'circle' || k === 'bar';
+
+function newRun(){
+  S = {level: setLevel, rounds: buildRounds(setLevel), i: 0, score: 0, results: [], phase: 'forge', attempts: 0, msg: '', mtype: '', B: null, forged: null, simp: null, bonus: 0};
+  $('modal').hidden = true;
+  startRound();
+}
+function startRound(){
+  const r = R(), t = r.target, fixed = S.level === 2;
+  S.phase = 'forge'; S.attempts = 0; S.forged = null; S.simp = null; S.bonus = 0;
+  S.B = isDiag(t.kind)
+    ? {shapes: 1, parts: fixed ? t.d : 2, shaded: new Set()}
+    : {w: t.kind === 'mixed' ? 1 : 0, n: 1, d: fixed ? t.d : 2};
+  S.msg = S.level === 2
+    ? `Two cards are shown. Forge the ${KIND[t.kind].toLowerCase()} so it is worth the same amount. The ${isDiag(t.kind) ? 'number of parts' : 'bottom number'} is locked at ${t.d}.`
+    : `Two cards are shown. Forge the ${KIND[t.kind].toLowerCase()} so it is worth the same amount.`;
+  S.mtype = '';
+  render();
+}
+const totalShaded = () => S.B.shaded.size;
+
+/* ---------- forge check ---------- */
+function forge(){
+  const r = R(), t = r.target, B = S.B;
+  let N, D, card;
+  if (isDiag(t.kind)){
+    N = B.shaded.size; D = B.parts;
+    if (N === 0){ S.msg = 'Shade some parts first.'; S.mtype = 'bad'; return render(); }
+    if (Math.ceil(N / D) > B.shapes){ S.msg = `You have shaded more parts than ${B.shapes === 1 ? 'one shape' : B.shapes + ' shapes'} can hold. Add another shape, or check your shading.`; S.mtype = 'bad'; return render(); }
+    card = {kind: t.kind, n: N, d: D};
+  } else if (t.kind === 'mixed'){
+    if (!(B.w >= 1 && B.n >= 1 && B.n < B.d)){ S.msg = 'A mixed number needs a whole part of at least 1 and a fraction whose top is smaller than its bottom.'; S.mtype = 'bad'; return render(); }
+    N = B.w * B.d + B.n; D = B.d; card = {kind: 'mixed', w: B.w, n: B.n, d: B.d};
+  } else {
+    N = B.n; D = B.d; card = {kind: t.kind, n: B.n, d: B.d};
+  }
+  if (N * r.Q === r.P * D){
+    const pts = FORGE_PTS[Math.min(S.attempts, 2)];
+    S.score += pts;
+    S.forged = card;
+    const given = r.givens.map(shortLabel);
+    S.simp = card.kind === 'mixed'
+      ? {w: card.w, n: card.n, d: card.d, steps: 0, wrong: 0, trail: []}
+      : {w: 0, n: N, d: D, steps: 0, wrong: 0, trail: []};
+    S.results[S.i] = {status: S.attempts === 0 ? 'first' : 'later', forge: pts, bonus: 0};
+    S.phase = 'simplify';
+    S.msg = `Forged. ${given[0]} = ${given[1]} = ${shortLabel(card)}. Plus ${pts}. Now the Simplify bonus.`;
+    S.mtype = 'good';
+    return render();
+  }
+  S.attempts++;
+  const cmp = N * r.Q < r.P * D ? 'smaller' : 'bigger';
+  let m = `Not quite. Your card is worth ${cmp} than the other two. Compare it with them and adjust.`;
+  if (S.attempts >= 2) m += ` Hint: in simplest form the amount is ${simplestText(r.P, r.Q)}.`;
+  if (S.attempts >= 3) m += ' You can also reveal it, for 0 points.';
+  S.msg = m; S.mtype = 'bad';
+  render();
+  const st = $('stage'); st.classList.remove('shake'); void st.offsetWidth; st.classList.add('shake');
+}
+function reveal(){
+  const r = R();
+  S.forged = r.target;
+  S.results[S.i] = {status: 'reveal', forge: 0, bonus: 0};
+  S.phase = 'roundEnd';
+  const given = r.givens.map(shortLabel);
+  S.msg = `Revealed: ${given[0]} = ${given[1]} = ${shortLabel(r.target)}. Study how the three match, then try the next one.`;
+  S.mtype = '';
+  render();
+}
+
+/* ---------- simplify bonus ---------- */
+function divide(k){
+  const s = S.simp;
+  if (s.n % k === 0 && s.d % k === 0){
+    s.trail.push(`${s.n}/${s.d} becomes ${s.n/k}/${s.d/k}`);
+    s.n /= k; s.d /= k; s.steps++;
+    if (gcd(s.n, s.d) === 1) return finishSimplify();
+    S.msg = `Good, divided by ${k}. Can it shrink any further?`; S.mtype = 'good';
+  } else {
+    s.wrong++;
+    S.msg = `${k} does not divide evenly into both ${s.n} and ${s.d}. Try another number.`; S.mtype = 'bad';
+  }
+  render();
+}
+function alreadySimplest(){
+  const s = S.simp;
+  if (gcd(s.n, s.d) === 1){ finishSimplify(); }
+  else { s.wrong++; S.msg = `Not yet. ${s.n} and ${s.d} still share a common factor. Find a number that divides both.`; S.mtype = 'bad'; render(); }
+}
+function finishSimplify(){
+  const s = S.simp, clean = s.wrong === 0 && s.steps <= 1;
+  const b = SIMP + (clean ? CLEAN : 0);
+  S.score += b; S.results[S.i].bonus = b; S.bonus = b;
+  S.phase = 'roundEnd';
+  const shown = (s.w ? s.w + ' ' : '') + `${s.n}/${s.d}`;
+  S.msg = (s.steps === 0 ? `It was already in simplest form: ${shown}. ` : `Simplest form: ${shown}. `) + `Plus ${b}${clean ? ' (clean finish)' : ''}.`;
+  S.mtype = 'good';
+  render();
+}
+function next(){
+  if (S.i >= T - 1) return finish();
+  S.i++;
+  startRound();
+}
+
+/* ---------- views ---------- */
+function stepper(key, val, label, min, max){
+  return `<div class="st"><button data-act="dec" data-k="${key}" aria-label="less ${label}" ${val <= min ? 'disabled' : ''}>&minus;</button><span class="sv" aria-label="${label} ${val}">${val}</span><button data-act="inc" data-k="${key}" aria-label="more ${label}" ${val >= max ? 'disabled' : ''}>+</button></div>`;
+}
+function forgeHTML(){
+  const r = R(), t = r.target, B = S.B, fixed = S.level === 2;
+  let body = '';
+  if (isDiag(t.kind)){
+    body = `<div class="dctl">
+      <div><div class="wl">Parts in each ${t.kind}</div>${fixed ? `<div class="fixd" style="font-size:30px">${B.parts}<small>locked</small></div>` : stepper('parts', B.parts, 'parts', 2, 12)}</div>
+      <div><div class="wl">${t.kind === 'circle' ? 'Circles' : 'Bars'}</div>${stepper('shapes', B.shapes, 'shapes', 1, 4)}</div>
+    </div>
+    <div class="readout">Tap pieces to shade them. Shaded so far: ${B.shaded.size}</div>
+    ${builderSVG(t.kind, B.shapes, B.parts, B.shaded)}
+    <div class="row-btns"><button class="btn ghost small" data-act="clear">Clear shading</button></div>`;
+  } else {
+    body = `<div class="nb">
+      ${t.kind === 'mixed' ? `<div><div class="wl">Whole</div>${stepper('w', B.w, 'whole', 0, 9)}</div>` : ''}
+      <div class="fracb">
+        <div class="wl">Top</div>
+        ${stepper('n', B.n, 'top number', 0, 60)}
+        <div class="vinc"></div>
+        ${fixed ? `<div class="fixd">${B.d}<small>locked</small></div>` : stepper('d', B.d, 'bottom number', 1, 12)}
+        <div class="wl" style="margin-top:4px">Bottom</div>
+      </div>
+    </div>`;
+  }
+  return `<h2>Forge the ${KIND[t.kind].toLowerCase()}</h2>
+    <p>${isDiag(t.kind) ? 'Cut it into equal parts, add shapes if you need more than one whole, then shade the right amount.' : 'Use the dials to build a card worth the same amount as the other two.'}</p>
+    ${body}
+    <div class="row-btns">
+      <button class="btn" data-act="forge">Forge it</button>
+      ${S.attempts >= 3 ? '<button class="btn ghost" data-act="reveal">Reveal (0 points)</button>' : ''}
+    </div>`;
+}
+function simplifyHTML(){
+  const s = S.simp;
+  const chips = [2,3,4,5,6,7,8,9,10,11,12].map(k => `<button class="chip" data-act="div" data-k="${k}" aria-label="divide top and bottom by ${k}">&divide;${k}</button>`).join('');
+  return `<h2>Simplify bonus</h2>
+    <p>${isDiag(R().target.kind) ? 'Your diagram shows' : 'Your card shows'} this fraction${s.w ? ' (the fraction part)' : ''}. Shrink it by dividing the top and bottom by the same number. Stop when it cannot shrink any more.</p>
+    <div class="bigfrac">${fracHTML(s.w, s.n, s.d)}</div>
+    <div class="trail">${s.trail.length ? s.trail[s.trail.length-1] : ''}</div>
+    <div class="chips">${chips}</div>
+    <div class="row-btns"><button class="btn ghost" data-act="simplest">It is already simplest</button></div>`;
+}
+function roundEndHTML(){
+  const last = S.i === T - 1;
+  return `<h2>${S.results[S.i].status === 'reveal' ? 'Take a look' : 'Nice work'}</h2>
+    <p>${S.results[S.i].status === 'reveal' ? 'Read across the three cards and notice what they share.' : `This triplet earned ${S.results[S.i].forge + S.results[S.i].bonus} points.`}</p>
+    <div class="row-btns"><button class="btn" data-act="next">${last ? 'See results' : 'Next triplet'}</button></div>`;
+}
+function render(){
+  if (!S) return;
+  const r = R();
+  $('score').textContent = S.score;
+  $('prog').innerHTML = S.rounds.map((_, i) => {
+    const res = S.results[i];
+    const cls = (i === S.i && S.phase === 'forge') ? 'cur' : (res ? res.status : '');
+    return `<span class="ph ${cls}"></span>`;
+  }).join('');
+  const b = $('banner'); b.textContent = S.msg; b.className = S.mtype;
+  const forged = S.forged;
+  $('triplet').innerHTML =
+    `<div class="slot"><div class="card">${faceHTML(r.givens[0])}</div><div class="cap">${KIND[r.givens[0].kind]}</div></div>
+     <div class="eq">=</div>
+     <div class="slot"><div class="card">${faceHTML(r.givens[1])}</div><div class="cap">${KIND[r.givens[1].kind]}</div></div>
+     <div class="eq">=</div>
+     <div class="slot tgt"><div class="card ${forged ? 'forged' : 'ph0'}">${forged ? faceHTML(forged) : '?'}</div><div class="cap">${forged ? 'Forged' : 'Forge: ' + KIND[r.target.kind]}</div></div>`;
+  const st = $('stage');
+  st.innerHTML = S.phase === 'forge' ? forgeHTML() : S.phase === 'simplify' ? simplifyHTML() : roundEndHTML();
+}
+
+/* ---------- finish ---------- */
+function finish(){
+  S.phase = 'over';
+  const max = T * (FORGE_PTS[0] + SIMP + CLEAN);
+  const first = S.results.filter(x => x.status === 'first').length;
+  const clean = S.results.filter(x => x.bonus === SIMP + CLEAN).length;
+  const pct = S.score / max;
+  const title = pct >= .85 ? 'Hive Master' : pct >= .65 ? 'Honey Maker' : pct >= .4 ? 'Worker Bee' : 'Keep forging';
+  $('panel').innerHTML = `
+    <h3>${title}</h3>
+    <div class="finalrow"><div><span class="big">${S.score}</span>of ${max} points</div><div><span class="big">${first}</span>first try forges</div><div><span class="big">${clean}</span>clean simplifies</div></div>
+    <p>Try the other level, or run it again for a fresh set of triplets.</p>
+    <div style="text-align:right;margin-top:10px"><button class="btn" id="again">New run</button></div>`;
+  $('modal').hidden = false;
+  $('again').addEventListener('click', newRun);
+  render();
+}
+
+/* ---------- wiring ---------- */
+$('stage').addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el || !S) return;
+  const act = el.dataset.act, k = el.dataset.k, B = S.B;
+  if (act === 'inc' || act === 'dec'){
+    const d = act === 'inc' ? 1 : -1;
+    const lim = {w:[0,9], n:[0,60], d:[1,12], parts:[2,12], shapes:[1,4]}[k];
+    B[k] = Math.min(lim[1], Math.max(lim[0], B[k] + d));
+    if (k === 'parts') B.shaded.clear();
+    if (k === 'shapes') B.shaded = new Set([...B.shaded].filter(x => +x.split(':')[0] < B.shapes));
+    S.mtype = ''; render();
+  } else if (act === 'slice'){
+    const key = el.dataset.s + ':' + el.dataset.i;
+    if (B.shaded.has(key)) B.shaded.delete(key); else B.shaded.add(key);
+    render();
+  } else if (act === 'clear'){ B.shaded.clear(); render(); }
+  else if (act === 'forge') forge();
+  else if (act === 'reveal') reveal();
+  else if (act === 'div') divide(+k);
+  else if (act === 'simplest') alreadySimplest();
+  else if (act === 'next') next();
+});
+$('btnNew').addEventListener('click', newRun);
+$('segLevel').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  $('segLevel').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+  setLevel = +b.dataset.v; newRun();
+});
+
+window.FG = {newRun, state: () => S, setLevel: l => { setLevel = l; }, buildRounds};
+newRun();
+})();
+</script>
+</body>
+</html>
