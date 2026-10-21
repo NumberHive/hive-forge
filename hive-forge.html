@@ -67,8 +67,8 @@ details.how ol{margin:8px 0 2px;padding-left:20px;line-height:1.45}
 .nb{display:flex;justify-content:center;align-items:center;gap:18px;margin:6px 0 16px}
 .fracb{display:inline-flex;flex-direction:column;align-items:center}
 .vinc{height:6px;background:var(--navy);width:100%;border-radius:3px;margin:8px 0}
-.st{display:inline-flex;align-items:center;gap:8px}
-.st button{width:44px;height:44px;border-radius:12px;border:2px solid var(--navy);background:var(--honey);font:inherit;font-size:26px;font-weight:900;color:var(--navy);cursor:pointer;line-height:1;padding:0}
+.st{display:inline-flex;align-items:center;gap:6px}
+.st button{width:34px;height:34px;border-radius:10px;border:2px solid var(--navy);background:var(--honey);font:inherit;font-size:20px;font-weight:900;color:var(--navy);cursor:pointer;line-height:1;padding:0}
 .st button:disabled{opacity:.3;cursor:default}
 .sv{min-width:58px;text-align:center;font-size:42px;font-weight:900}
 .fixd{display:flex;flex-direction:column;align-items:center;font-size:42px;font-weight:900;padding:0 4px}
@@ -76,7 +76,7 @@ details.how ol{margin:8px 0 2px;padding-left:20px;line-height:1.45}
 .wl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);text-align:center;margin-bottom:4px}
 .dctl{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;align-items:flex-end;margin-bottom:8px}
 .dctl .sv{font-size:30px;min-width:44px}
-.dctl .st button{width:38px;height:38px;font-size:22px}
+.dctl .st button{width:30px;height:30px;font-size:18px}
 .readout{text-align:center;font-weight:800;font-size:14px;margin:4px 0 8px}
 .dsvg{display:block;margin:0 auto;max-width:360px;width:100%}
 .dsvg [data-act="slice"]{cursor:pointer;transition:fill .1s}
@@ -86,6 +86,15 @@ details.how ol{margin:8px 0 2px;padding-left:20px;line-height:1.45}
 .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:12px}
 .chip{border:2px solid var(--navy);background:var(--honey-l);border-radius:12px;padding:8px 12px;font:inherit;font-weight:900;font-size:17px;color:var(--navy);cursor:pointer;min-width:52px}
 .chip:hover{background:var(--honey)}
+.dviz{display:flex;justify-content:center;align-items:center;gap:12px;margin:6px 0 0}
+.dviz .wh{font-size:46px;font-weight:800}
+.dvfrac{display:inline-flex;flex-direction:column;align-items:stretch}
+.dvrow{display:flex;justify-content:center;align-items:baseline;gap:12px;font-weight:900}
+.dvnum{font-size:46px;line-height:1.05}
+.dvop{font-size:24px;color:var(--honey-d);min-width:56px;text-align:left}
+.dvbar{height:6px;background:var(--navy);border-radius:3px;margin:6px 0;width:calc(100% - 68px)}
+.dveq{text-align:center;font-size:30px;font-weight:900;color:var(--muted);line-height:1;margin:4px 0}
+.bigfrac.res{color:var(--good)}
 .trail{text-align:center;font-weight:800;font-size:14px;color:var(--muted);min-height:20px;margin-bottom:6px}
 .modal{position:fixed;inset:0;background:rgba(27,42,73,.6);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
 .modal[hidden]{display:none}
@@ -94,7 +103,7 @@ details.how ol{margin:8px 0 2px;padding-left:20px;line-height:1.45}
 .panel p{margin:6px 0;line-height:1.45;font-size:15px}
 .finalrow{display:flex;justify-content:space-around;margin:12px 0;font-weight:800;text-align:center}
 .finalrow .big{font-size:34px;display:block}
-@media (max-width:420px){ h1{font-size:20px} .st button{width:40px;height:40px} .sv{min-width:44px;font-size:36px} .nb{gap:10px} }
+@media (max-width:420px){ h1{font-size:20px} .st button{width:32px;height:32px} .sv{min-width:44px;font-size:36px} .nb{gap:10px} }
 @media (prefers-reduced-motion:reduce){ .card.forged,.stage.shake{animation:none} }
 </style>
 </head>
@@ -355,7 +364,7 @@ function reveal(){
 function divide(k){
   const s = S.simp;
   if (s.n % k === 0 && s.d % k === 0){
-    s.trail.push(`${s.n}/${s.d} becomes ${s.n/k}/${s.d/k}`);
+    s.last = {w: s.w, n0: s.n, d0: s.d, k};
     s.n /= k; s.d /= k; s.steps++;
     if (gcd(s.n, s.d) === 1) return finishSimplify();
     S.msg = `Good, divided by ${k}. Can it shrink any further?`; S.mtype = 'good';
@@ -421,19 +430,31 @@ function forgeHTML(){
       ${S.attempts >= 3 ? '<button class="btn ghost" data-act="reveal">Reveal (0 points)</button>' : ''}
     </div>`;
 }
+function divViz(s){
+  const L = s.last;
+  if (!L) return '';
+  const row = v => `<div class="dvrow"><span class="dvnum">${v}</span><span class="dvop">&divide;${L.k}</span></div>`;
+  return `<div class="dviz" aria-label="${L.n0} over ${L.d0}, divide top and bottom by ${L.k}">
+      ${L.w ? `<span class="wh">${L.w}</span>` : ''}
+      <div class="dvfrac">${row(L.n0)}<div class="dvbar"></div>${row(L.d0)}</div>
+    </div>
+    <div class="dveq" aria-hidden="true">=</div>`;
+}
 function simplifyHTML(){
   const s = S.simp;
   const chips = [2,3,4,5,6,7,8,9,10,11,12].map(k => `<button class="chip" data-act="div" data-k="${k}" aria-label="divide top and bottom by ${k}">&divide;${k}</button>`).join('');
   return `<h2>Simplify bonus</h2>
     <p>${isDiag(R().target.kind) ? 'Your diagram shows' : 'Your card shows'} this fraction${s.w ? ' (the fraction part)' : ''}. Shrink it by dividing the top and bottom by the same number. Stop when it cannot shrink any more.</p>
+    ${divViz(s)}
     <div class="bigfrac">${fracHTML(s.w, s.n, s.d)}</div>
-    <div class="trail">${s.trail.length ? s.trail[s.trail.length-1] : ''}</div>
     <div class="chips">${chips}</div>
     <div class="row-btns"><button class="btn ghost" data-act="simplest">It is already simplest</button></div>`;
 }
 function roundEndHTML(){
   const last = S.i === T - 1;
-  return `<h2>${S.results[S.i].status === 'reveal' ? 'Take a look' : 'Nice work'}</h2>
+  const done = S.results[S.i].status !== 'reveal' && S.simp;
+  const result = done ? `${divViz(S.simp)}<div class="bigfrac res">${fracHTML(S.simp.w, S.simp.n, S.simp.d)}</div>` : '';
+  return `<h2>${S.results[S.i].status === 'reveal' ? 'Take a look' : 'Nice work'}</h2>${result}
     <p>${S.results[S.i].status === 'reveal' ? 'Read across the three cards and notice what they share.' : `This triplet earned ${S.results[S.i].forge + S.results[S.i].bonus} points.`}</p>
     <div class="row-btns"><button class="btn" data-act="next">${last ? 'See results' : 'Next triplet'}</button></div>`;
 }
